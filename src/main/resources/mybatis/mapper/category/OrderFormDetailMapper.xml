@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hotel.category.mapper.OrderFormDetailMapper">
+    <insert id="insertOrderFormInformation" parameterType="com.hotel.category.bean.OrderFormDetail">
+        insert into food_orderform_detail
+            (fod_orderform_id,fod_information_id,fod_number)
+            values (#{fodOrderformId},#{fodInformationId},#{fodNumber})
+    </insert>
+
+    <select id="selectOrderFormDetail" parameterType="java.lang.Long" resultType="java.util.HashMap">
+        select fod_id,fod_number,fi_name,fi_price,url
+            from food_orderform_detail inner join food_orderform
+                on fod_orderform_id = fo_id
+                and fo_id = #{foId} inner join food_information
+                on fod_information_id = fi_id left join image
+                on i_food_id = fi_id
+                order by fod_id
+    </select>
+
+</mapper>

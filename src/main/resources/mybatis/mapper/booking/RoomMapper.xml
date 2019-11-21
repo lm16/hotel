@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.hotel.booking.mapper.RoomMapper">
+
+
+
+    <select id="getAllorGroup" resultType="map" parameterType="int">
+        select a.id, a.name, b.name 'type', a.status, a.booking_id from room_info a
+        left join room_type b on a.room_type_id=b.id
+        where 1
+        <if test="roomTypeId != null">
+        and a.room_type_id=#{roomTypeId}
+        </if>
+        <if test="status != null">
+            <choose>
+                <when test="status == 0">
+                    and status=0
+                </when>
+                <when test="status == 1">
+                    and status!=0
+                </when>
+                <when test="status > 1">
+                    and status=#{status}
+                </when>
+            </choose>
+        </if>
+    </select>
+
+    <select id="getAll" resultType="map" parameterType="int">
+        select a.id, a.name, b.name 'type', a.status from room_info a
+        left join room_type b on a.room_type_id=b.id
+        where 1 and a.status=0
+        <if test="_parameter != null">
+        and a.room_type_id=#{roomTypeId}
+        </if>
+    </select>
+
+    <insert id="create" parameterType="RoomInfo" keyProperty="id">
+        insert into room_info(name, room_type_id) values (#{name}, #{roomTypeId})
+    </insert>
+    <insert id="createHistory" parameterType="int">
+        insert into room_info_history(room_info_id) values(#{id})
+    </insert>
+
+    <update id="livein" parameterType="LiveinPart">
+        update room_info set status=1, booking_id=#{bookingId} where id=#{roomId} and status=0
+    </update>
+
+    <update id="delete" parameterType="int">
+        update room_info set `delete`=1 where id=#{id}
+    </update>
+
+<!--    <update id="countdown">-->
+
+<!--    </update>-->
+
+    <update id="checkOut" parameterType="int">
+        update room_info set status=3, booking_id=null where status=2 and booking_id=#{bookingId}
+    </update>
+
+    <update id="cleanUp" parameterType="int">
+        update room_info set status=0 where id=#{id} and status=3
+    </update>
+</mapper>

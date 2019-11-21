@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hotel.category.mapper.InformationMapper">
+
+    <insert id="insertInformation" parameterType="com.hotel.category.bean.Information" useGeneratedKeys="true" keyProperty="fiId" >
+         insert into food_information (fi_category_id,fi_name,fi_price,fi_description,fi_employee_id)
+             values (#{fiCategoryId},#{fiName},#{fiPrice},#{fiDescription},#{fiEmployeeId})
+    </insert>
+
+    <delete id="deleteInformation" parameterType="Long">
+        delete from food_information
+            where fi_id = #{fiId}
+    </delete>
+
+    <update id="updateInformation" parameterType="com.hotel.category.bean.Information">
+        update food_information
+            set fi_name = #{fiName},fi_category_id = #{fiCategoryId},
+                fi_price = #{fiPrice},fi_description = #{fiDescription},
+                fi_employee_id = #{fiEmployeeId}
+                where fi_id = #{fiId}
+    </update>
+
+    <select id="selectInformation" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select fi_name,fi_category_id,fi_price,fi_description,fc_name,e_name,fi_employee_id,url
+            from food_information inner join food_category
+                on fi_category_id = fc_id
+                <if test="fiName!=null and fiName!=''">
+                    and fi_name like concat(#{fiName},'%')
+                </if>
+                inner join employee
+                on fi_employee_id = e_id
+                left join image
+                    on fi_id = i_food_id
+
+    </select>
+
+    <!--<resultMap id="InformationMap" type="com.hotel.category.bean.Information">-->
+        <!--<id property="fiId" column="fi_id"></id>-->
+        <!--<association property="category" javaType="com.hotel.category.bean.Category">-->
+             <!--<result property="fcName" column="fc_name"></result>-->
+        <!--</association>-->
+    <!--</resultMap>-->
+
+    <select id="selectInformationChef" resultType="java.util.HashMap">
+        SELECT e_id,e_name
+        FROM
+        employee
+        INNER JOIN emp_position ON e_position_id = ep_id
+        AND ep_name_cn = '厨师'
+        INNER JOIN emp_department ON e_department_id = ed_id
+        AND ed_name = '餐饮部'
+    </select>
+
+</mapper>

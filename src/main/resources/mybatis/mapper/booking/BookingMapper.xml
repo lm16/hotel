@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.hotel.booking.mapper.BookingMapper">
+
+    <select id="getAll" resultType="Booking" parameterType="map">
+        select a.*, b.name roomTypeName from
+            booking a inner join room_type b on a.room_type_id=b.id
+
+        where 1
+        <if test="status != null">
+            and status=#{status}
+        </if>
+        <if test="name != null">
+            and name=#{name}
+        </if>
+        <if test="phone != null">
+            and phone=#{phone}
+        </if>
+        <if test="handle == 1">
+            and start=curdate()
+        </if>
+<!--        where status='已支付';-->
+    </select>
+
+    <select id="getOne" resultType="Booking" parameterType="int">
+        select a.*, b.name roomTypeName from booking a inner join room_type b on a.room_type_id=b.id where a.id=#{id}
+    </select>
+
+    <select id="getStatus" resultType="string" parameterType="int">
+        select status from booking where id=#{id}
+    </select>
+
+    <insert id="create" parameterType="Booking" keyProperty="id">
+
+<!--        insert into booking(name, room_type_id, `start`, `end`) values(#{name}, #{roomTypeId}, #{start}, #{end})-->
+        insert into booking
+        (`start`, `end`, room_type_id, name, phone, sex, remark, deposit, member_cardnum, member_deposit)
+        values
+        (#{start}, #{end}, #{roomTypeId}, #{name}, #{phone}, #{sex}, #{remark}, #{deposit}, #{memberCardnum}, #{memberDeposit})
+    </insert>
+
+    <select id="getCount" resultType="Map">
+        select room_id as roomId, count(1) as count from room_info
+        group by room_id;
+    </select>
+
+    <select id="getByBooking" resultType="Booking">
+        select `start`, `end`, room_type_id from booking where booking=#{time}
+    </select>
+
+    <select id="getUnBookingCount" resultType="Map" parameterType="Map">
+        select b.id, b.name, b.`count`-ifnull(`count(1)`, 0) as rest from room_type b
+        left join(
+        select a.room_type_id, count(1) from booking a where(
+        <![CDATA[
+        (a.`start`<="2019-10-14" and a.`end`>="2019-10-15")
+        or (a.`start`>"2019-10-14" and a.`end`<"2019-10-15")
+        ]]>)
+        group by a.room_type_id
+        ) c on b.id=c.room_type_id;
+    </select>
+
+    <select id="getDateBookingCount" resultType="Map" parameterType="Map">
+        select id, name, ifnull(`count(1)`, 0) as `count`
+        from room_type mb left join (
+        <![CDATA[
+        select room_id, count(1) from room_info a
+        where exists(
+        select 1 from booking b
+        where b.`start`<=#{date} and b.`end`>#{date}
+        and b.room_unit_id=a.id
+        ) group by room_id
+        ]]>
+        ) sb on mb.id=sb.room_id;
+    </select>
+
+
+    <select id="getByName" resultType="map" parameterType="String">
+        select id, room_type_id roomTypeId from booking where name=#{name} and `start`=curdate() and status='已支付';
+    </select>
+
+
+
+    <update id="pay" parameterType="int">
+        update booking set status='已支付' where id=#{id} and status='未支付'
+    </update>
+
+    <update id="livein" parameterType="int">
+        update booking set status='已结算' where id=#{id} and status='已支付'
+    </update>
+
+    <update id="unpay" parameterType="string">
+<!--        selectkey 取到的都是 null-->
+    <![CDATA[
+        update booking set status="超时" where booking=#{time} and status="未支付"
+    ]]>
+    </update>
+
+
+</mapper>

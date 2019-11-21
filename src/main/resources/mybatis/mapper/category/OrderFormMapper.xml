@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hotel.category.mapper.OrderFormMapper">
+
+    <insert id="insertOrderForm" useGeneratedKeys="true" keyProperty="foId">
+        insert into food_orderform
+            (fo_out_trade_no,fo_order_name,fo_desk_id,fo_start_time,fo_employee_id,fo_monetary,fo_description,fo_status)
+                values (#{foOutTradeNo},#{foOrderName},#{foDeskId},now(),#{foEmployeeId},#{foMonetary},#{foDescription},0);
+    </insert>
+
+    <select id="selectOrderForm" resultType="java.util.HashMap">
+        select fo_id,fo_out_trade_no,fo_order_name,fd_name,fo_card_number,
+            fo_monetary,fo_start_time,fo_end_time,fo_description
+            from food_orderform  left join food_desk
+            on fo_desk_id = fd_id where fo_status = #{foStatus}
+            <if test="startDate!= null and endDate != null">
+                and fo_start_time <![CDATA[ >= ]]> #{startDate}
+                and fo_start_time <![CDATA[ <= ]]> date_add(#{endDate},interval 1 day)
+            </if>
+            order by fo_start_time desc
+    </select>
+
+    <update id="cancelOrderForm" parameterType="java.lang.Long">
+        update food_orderform
+            set fo_status = 1
+            where fo_id = #{foId}
+    </update>
+
+    <update id="finishOrderForm" parameterType="com.hotel.category.bean.OrderForm">
+        update food_orderform
+            set fo_card_number = #{foCardNumber},fo_monetary = #{foMonetary},
+            fo_end_time = now(),fo_status = 2
+            where fo_id = #{foId}
+    </update>
+
+
+</mapper>

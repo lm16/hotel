@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.hotel.booking.mapper.LiveinMapper">
+
+    <select id="getT" resultType="Livein">
+        select id, booking_id, room_id, identity, employee_id, check_in, check_out from livein
+    </select>
+
+    <select id="getStatus" resultType="map">
+        select b.id, ifnull(c.room_id, 0) as status from room_info b left join(
+        select room_id from livein a
+        where (
+        <![CDATA[
+        (a.`start`<=curdate() and a.`end`>=subdate(curdate(), -1))
+        or (a.`start`>curdate() and a.`end`<subdate(curdate(), -1))
+        ]]>)
+        ) c on b.id = c.room_id
+    </select>
+
+    <insert id="create" parameterType="LiveinPart" keyProperty="id">
+        insert into livein(booking_id, room_id, identity) values(#{bookingId}, #{roomId}, #{identity})
+    </insert>
+
+    <update id="leave">
+    <![CDATA[
+        update room_info a, booking b set a.status = 0, a.booking_id=null where b.status='已结算' and a.booking_id=b.id and b.`end`<curdate()
+    ]]>
+    </update>
+
+    <insert id="livewith" parameterType="map" >
+        insert into livewith(identity, livein_id) values(#{identity}, #{liveinId})
+    </insert>
+
+    <update id="checkOut">
+        update livein set check_out=now() where booking_id=#{bookingId}
+    </update>
+
+
+    <update id="end" >
+        update room_info a inner join booking b on a.booking_id=b.id set a.status=2 where b.`end`=curdate()
+    </update>
+
+
+
+</mapper>

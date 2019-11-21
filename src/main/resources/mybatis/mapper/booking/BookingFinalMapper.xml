@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.hotel.booking.mapper.BookingFinalMapper">
+
+    <insert id="create" parameterType="BookingFinal">
+        insert ignore into booking_final(date, room_type_id, count)
+        values(#{date}, #{roomTypeId}, #{count})
+    </insert>
+
+    <select id="getByDate" resultType="map" parameterType="map">
+        select a.id, a.name, a.price, a.description, g.url, c.rest from room_type a
+        inner join (select room_type_id, max(url) url from room_type_img b group by b.room_type_id) g on a.id=g.room_type_id
+        inner join (
+        select room_type_id roomTypeId, min(`count`) rest from booking_final
+        where `date` between #{start} and #{end}
+        group by room_type_id) c on a.id=c.roomTypeId
+    </select>
+
+    <select id="getCount" resultType="short" parameterType="Booking">
+        select `count` from booking_final
+        where `date`=#{start} and room_type_id=#{roomTypeId}
+    </select>
+    <update id="pay" parameterType="Booking">
+        update booking_final set `count`=`count`-1
+        where `date`=#{start} and room_type_id=#{roomTypeId}
+    </update>
+
+    <update id="restore" parameterType="Booking">
+        update booking_final set `count`=`count`+1
+        where `date`=#{start} and room_type_id=#{roomTypeId}
+    </update>
+
+</mapper>

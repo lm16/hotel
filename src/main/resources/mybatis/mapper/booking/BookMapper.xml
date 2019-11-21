@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.hotel.booking.mapper.RoomMapper">
+
+    <select id="room" resultType="Map" parameterType="Map">
+        select id, name from room where id>3
+    </select>
+
+    <select id="getCount" resultType="Map">
+        select room_id as roomId, count(1) as count from room_unit
+        group by room_id;
+    </select>
+
+
+    <select id="getUnBookingCount" resultType="Map" parameterType="Map">
+        select d.roomId, c.name, d.`count` from room c
+        inner join(
+        select room_id as roomId, count(1) as `count` from room_unit a
+        where not exists(
+        <![CDATA[
+        select 1 from booking b
+        where (
+        (b.`start`<=#{start} and b.`end`>=#{end})
+        or (b.`start`>#{start} and b.`end`<#{end})
+        ) and b.room_unit_id=a.id
+        ]]>
+        ) group by room_id
+        ) d on c.id=d.roomId;
+    </select>
+
+    <select id="getDateBookingCount" resultType="Map" parameterType="Map">
+        select id, name, ifnull(`count(1)`, 0) as `count`
+        from room mb left join (
+        <![CDATA[
+        select room_id, count(1) from room_unit a
+        where exists(
+        select 1 from booking b
+        where b.`start`<=#{date} and b.`end`>#{date}
+        and b.room_unit_id=a.id
+        ) group by room_id
+        ]]>
+        ) sb on mb.id=sb.room_id;
+    </select>
+
+</mapper>

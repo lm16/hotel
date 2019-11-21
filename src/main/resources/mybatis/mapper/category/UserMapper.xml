@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hotel.category.mapper.UserMapper">
+
+    <select id="findAll" resultType= "com.hotel.category.bean.Users" >
+        select * from users
+    </select>
+
+    <insert id="insertUser" parameterType="com.hotel.category.bean.Users">
+        insert into users ( name,password,telephone,username,isadmin )
+        values(#{name},#{password},#{telephone},#{username},#{isadmin})
+    </insert>
+
+</mapper>

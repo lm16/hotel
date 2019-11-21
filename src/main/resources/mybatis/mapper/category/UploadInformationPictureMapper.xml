@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hotel.category.mapper.UploadInformationPictureMapper">
+    <insert id="insertInformationImages" parameterType="com.hotel.image.bean.Image">
+        insert into image (i_food_id,url)
+            values (#{foodId},#{url})
+    </insert>
+
+    <delete id="deleteInformationImages" parameterType="java.lang.Long">
+        delete from image
+            where i_food_id = #{fiId}
+    </delete>
+
+    <select id="selectInformationImagesPath" parameterType="java.lang.Long" resultType="java.lang.String">
+        select url from image
+            where i_food_id = #{fiId}
+    </select>
+
+    <delete id="deleteInformationImageList" parameterType="java.util.List">
+        delete from image
+             where i_food_id in
+        <foreach collection="list" item="fiId" index="index" open="(" separator="," close=")">
+            #{fiId}
+        </foreach>
+    </delete>
+
+</mapper>

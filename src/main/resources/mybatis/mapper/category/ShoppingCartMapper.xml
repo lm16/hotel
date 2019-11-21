@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hotel.category.mapper.ShoppingCartMapper">
+     <select id="selectInformationById" parameterType="java.lang.Long" resultType="java.util.HashMap">
+         select fi_id,fi_name,fi_price,fi_description,url
+             from food_information,image
+                 where fi_id = i_food_id
+                 and fi_id = #{fiId}
+     </select>
+
+</mapper>

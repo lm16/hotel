@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hotel.category.mapper.DeskMapper">
+
+    <insert id="insertDesk" parameterType="com.hotel.category.bean.Desk">
+        insert into food_Desk
+            (fd_restaurant_id,fd_name,fd_type,fd_status)
+                 values (#{fdRestaurantId},#{fdName},#{fdType},#{fdStatus})
+    </insert>
+
+    <select id="selectDesk" resultType="java.util.HashMap">
+        select fd_id,fd_restaurant_id,fd_name,fd_type,fd_status,fr_name
+            from food_Desk inner join food_restaurant
+                on fd_restaurant_id = fr_id
+    </select>
+
+    <update id="updateDesk" parameterType="com.hotel.category.bean.Desk">
+        update food_Desk set
+            fd_restaurant_id = #{fdRestaurantId},fd_name = #{fdName},
+            fd_type = #{fdType},fd_status = #{fdStatus}
+            where fd_id = #{fdId}
+    </update>
+
+    <delete id="deleteDesk" parameterType="java.lang.Long">
+        delete from food_desk
+            where fd_id = #{fdId}
+    </delete>
+
+    <select id="selectDeskName" resultType="java.util.HashMap">
+        select fd_id,fd_name
+            from food_desk
+                where fd_status = 0
+    </select>
+
+</mapper>

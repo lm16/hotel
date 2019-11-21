@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hotel.category.mapper.RestaurantMapper">
+    <insert id="insertRestaurant" parameterType="com.hotel.category.bean.Restaurant">
+        insert into food_restaurant
+            (fr_name,fr_address,fr_hours,fr_status)
+                values (#{frName},#{frAddress},#{frHours},#{frStatus})
+    </insert>
+
+    <select id="selectRestaurant" resultType="com.hotel.category.bean.Restaurant" parameterType="java.util.Date">
+        select fr_id,fr_name,fr_address,fr_hours,fr_status
+             from food_restaurant
+    </select>
+
+    <delete id="deleteRestaurant" parameterType="java.lang.Long">
+        delete from food_restaurant
+            where fr_id = #{frId}
+    </delete>
+
+    <update id="updateRestaurant" parameterType="com.hotel.category.bean.Restaurant">
+        update food_restaurant
+            set fr_name = #{frName},fr_address = #{frAddress},
+            fr_hours = #{frHours},fr_status = #{frStatus}
+                where fr_id = #{frId}
+    </update>
+
+    <select id="selectRestaurantDesk" parameterType="java.lang.Long" resultType="java.util.HashMap">
+        select fr_name,fd_id,fd_name,fd_type,fd_status
+            from food_restaurant,food_Desk
+                where fr_id = fd_restaurant_id
+                    and fr_id = #{frId}
+
+    </select>
+
+    <select id="selectRestaurantName" resultType="java.util.HashMap">
+        select fr_id,fr_name
+            from food_restaurant
+    </select>
+
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.hotel.booking.mapper.RoomTypeMapper">
+
+    <select id="getAll" resultType="RoomType2">
+<!--        select a.id, a.name, a.price, ifnull(b.`count(1)`, 0) 'count' from room_type a-->
+<!--        left join(-->
+<!--        select room_id, count(1) from room_info group by room_id-->
+<!--        )b on a.id=b.room_id where a.`delete` is null-->
+<!--        select a.id, a.name, a.price, a.description, b.url from room_type a-->
+<!--        left join image b on a.id=b.i_room_type_id-->
+<!--        select a.id, a.name, a.price, a.description, b.url, c.`count` from room_type a-->
+<!--        left join (select room_type_id, max(url) url from room_type_img group by room_type_id) b on a.id=b.room_type_id-->
+<!--        left join (select room_type_id, count(1) `count` from room_info group by room_type_id) c on a.id=c.room_type_id-->
+        select a.id, a.name, a.price, a.description, c.`count` from room_type a
+        left join (select room_type_id, count(1) `count` from room_info group by room_type_id) c on a.id=c.room_type_id
+    </select>
+
+    <select id="getName" resultType="string" parameterType="int">
+        select name from room_type where id=#{id}
+    </select>
+
+    <select id="getCost" resultType="decimal" parameterType="int">
+        select price from room_type where id=#{roomTypeId}
+    </select>
+
+    <insert id="create" parameterType="RoomType" keyProperty="id">
+        insert into room_type(name, price, description, url) values(#{name}, #{price}, #{description}, #{url})
+    </insert>
+
+    <insert id="createHistory" parameterType="RoomType">
+        insert into room_type_history(room_type_id, new_name) values(#{id}, #{name})
+    </insert>
+
+    <delete id="delete" parameterType="int">
+        delete from room_type where id=#{id}
+    </delete>
+
+    <insert id="deleteHistory">
+        insert into room_type_history(room_type_id, old_name) values(#{id}, #{name})
+    </insert>
+
+
+    <update id="update" parameterType="RoomType">
+        update room_type set name=#{name}, price=#{price}, url=#{url} where id=#{id}
+    </update>
+
+    <insert id="updateHistory" parameterType="map">
+        insert into room_type_history(room_type_id, old_name, new_name)
+        values(#{roomTypeId}, #{oldName}, #{newName})
+    </insert>
+
+<!--    -->
+    <select id="select" resultType="map">
+        select id, name from room_type
+    </select>
+
+    <insert id="img">
+        insert into room_type_img(room_type_id, url) values(#{roomTypeId}, #{url})
+    </insert>
+
+</mapper>
